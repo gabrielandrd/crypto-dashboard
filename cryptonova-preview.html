@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoNova Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0A0A16;
+  --bg2: #0F0F1E;
+  --card: #13132A;
+  --border: rgba(255,107,0,0.18);
+  --text: #F0EDE8;
+  --muted: #7A7A99;
+  --gold: #FFD700;
+  --orange: #FF6B00;
+  --cyan: #00CFFF;
+  --pink: #FF2D6B;
+  --green: #00E87A;
+  --red: #FF3D5A;
+  --font: 'Chakra Petch', monospace;
+  --mono: 'Space Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(255,107,0,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(0,207,255,0.06) 0%, transparent 50%);
+}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,22,0.95);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.header-inner{max-width:1300px;margin:0 auto;padding:0 24px;height:56px;
+  display:flex;align-items:center;gap:20px;}
+.logo{display:flex;align-items:center;gap:9px;font-size:17px;letter-spacing:3px;
+  color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.logo strong{color:var(--gold);}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--orange),var(--gold));
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  color:#000;font-size:13px;box-shadow:0 0 16px rgba(255,107,0,0.55);}
+.search{flex:1;max-width:320px;position:relative;}
+.search input{width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:8px 16px 8px 36px;color:var(--text);
+  font-family:var(--font);font-size:13px;outline:none;transition:.2s;}
+.search input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,107,0,0.1);}
+.search input::placeholder{color:var(--muted);}
+.search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;}
+.time-pill{margin-left:auto;background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:10px;
+  color:var(--muted);display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* MARKET BAR */
+.mbar{background:var(--bg2);border-bottom:1px solid rgba(255,215,0,0.07);
+  display:flex;align-items:center;padding:0 24px;height:36px;overflow-x:auto;
+  scrollbar-width:none;gap:0;}
+.mbar::-webkit-scrollbar{display:none;}
+.mstat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+  white-space:nowrap;padding:0 18px;font-family:var(--mono);}
+.mstat strong{color:var(--text);}
+.mstat .up{color:var(--green);}
+.mstat .dn{color:var(--red);}
+.mdiv{width:1px;height:16px;background:var(--border);flex-shrink:0;}
+
+/* MAIN */
+main{max-width:1300px;margin:0 auto;padding:28px 24px 60px;}
+
+/* STATS GRID */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.stats{grid-template-columns:1fr;}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;position:relative;overflow:hidden;transition:.2s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent,var(--orange)),transparent);}
+.stat-card:hover{transform:translateY(-2px);border-color:rgba(255,107,0,.35);}
+.stat-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.stat-val{font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.stat-sub{font-size:12px;color:var(--muted);}
+.stat-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.3;}
+
+/* LAYOUT 2COL */
+.layout-2{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-bottom:20px;}
+@media(max-width:1100px){.layout-2{grid-template-columns:1fr;}}
+
+/* TABLE CARD */
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;
+  box-shadow:0 4px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,215,0,.04);}
+.tcard-head{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.tcard-title{font-size:14px;font-weight:700;letter-spacing:1px;color:var(--gold);}
+.filter-row{display:flex;gap:6px;}
+.fbtn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  color:var(--muted);font-family:var(--font);font-size:11px;padding:5px 12px;
+  cursor:pointer;letter-spacing:.5px;transition:.15s;}
+.fbtn.active,.fbtn:hover{border-color:var(--orange);color:var(--orange);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:rgba(255,215,0,.03);border-bottom:1px solid var(--border);}
+th{padding:10px 14px;font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:left;}
+th.r{text-align:right;}
+.crow{border-bottom:1px solid rgba(255,107,0,.05);cursor:pointer;transition:.15s;}
+.crow:last-child{border-bottom:none;}
+.crow:hover{background:rgba(255,107,0,.04);}
+td{padding:13px 14px;font-size:14px;}
+.coin-info{display:flex;align-items:center;gap:10px;}
+.coin-img{width:28px;height:28px;border-radius:50%;object-fit:cover;}
+.coin-name{font-weight:600;font-size:14px;}
+.coin-sym{color:var(--muted);font-size:10px;font-family:var(--mono);letter-spacing:1px;}
+.price{font-family:var(--mono);font-weight:700;text-align:right;}
+.badge{display:inline-flex;align-items:center;gap:2px;font-family:var(--mono);
+  font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.badge.g{background:rgba(0,232,122,.12);color:var(--green);}
+.badge.r{background:rgba(255,61,90,.12);color:var(--red);}
+.rank{color:var(--muted);font-family:var(--mono);font-size:12px;}
+.cap{color:var(--muted);font-family:var(--mono);font-size:12px;text-align:right;}
+
+/* RIGHT COLUMN */
+.right-col{display:flex;flex-direction:column;gap:16px;}
+
+/* CHART CARD */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:20px;box-shadow:0 4px 40px rgba(0,0,0,.3);}
+.chart-card-title{font-size:13px;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+.chart-card-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;}
+.period-row{display:flex;gap:6px;margin-bottom:16px;}
+.pbtn{background:var(--bg2);border:1px solid var(--border);border-radius:5px;
+  color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:700;
+  padding:4px 10px;cursor:pointer;letter-spacing:1px;transition:.15s;}
+.pbtn.active{background:rgba(0,207,255,.12);border-color:var(--cyan);color:var(--cyan);}
+
+/* DOMINANCE CARD */
+.dom-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.dom-title{font-size:13px;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:16px;}
+.dom-item{margin-bottom:12px;}
+.dom-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.dom-name{font-size:12px;display:flex;align-items:center;gap:8px;}
+.dom-dot{width:8px;height:8px;border-radius:50%;}
+.dom-pct{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);}
+.dom-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.dom-fill{height:100%;border-radius:3px;transition:.5s;}
+
+/* FOOTER */
+footer{margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,215,0,.07);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-size:11px;color:var(--muted);font-family:var(--mono);}
+footer a{color:var(--orange);text-decoration:none;}
+footer a:hover{color:var(--gold);}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--orange);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      CRYPTO<strong>NOVA</strong>
+    </div>
+    <div class="search">
+      <span class="search-ico">🔍</span>
+      <input type="text" placeholder="Buscar criptomoeda...">
+    </div>
+    <div class="time-pill">
+      <div class="dot"></div>
+      LIVE · 14:32:07
+    </div>
+  </div>
+</header>
+
+<div class="mbar">
+  <div class="mstat">🌐 <span>Market Cap</span> <strong>$2.41T</strong> <span class="up">+1.4%</span></div>
+  <div class="mdiv"></div>
+  <div class="mstat">📊 <span>Volume 24h</span> <strong>$94.2B</strong></div>
+  <div class="mdiv"></div>
+  <div class="mstat">⚡ <span>BTC Dom.</span> <strong>52.3%</strong></div>
+  <div class="mdiv"></div>
+  <div class="mstat">💎 <span>ETH Dom.</span> <strong>17.1%</strong></div>
+  <div class="mdiv"></div>
+  <div class="mstat">🪙 <span>Moedas Ativas</span> <strong>14,892</strong></div>
+</div>
+
+<main>
+
+  <!-- Stats Cards -->
+  <div class="stats">
+    <div class="stat-card" style="--accent: var(--gold)">
+      <div class="stat-icon">₿</div>
+      <div class="stat-label">Bitcoin</div>
+      <div class="stat-val">$67,234</div>
+      <div class="stat-sub" style="color:var(--green)">▲ +2.34% (24h)</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--cyan)">
+      <div class="stat-icon">Ξ</div>
+      <div class="stat-label">Ethereum</div>
+      <div class="stat-val">$3,421</div>
+      <div class="stat-sub" style="color:var(--green)">▲ +1.82% (24h)</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--pink)">
+      <div class="stat-icon">◎</div>
+      <div class="stat-label">Solana</div>
+      <div class="stat-val">$178.40</div>
+      <div class="stat-sub" style="color:var(--red)">▼ -0.51% (24h)</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--orange)">
+      <div class="stat-icon">⬡</div>
+      <div class="stat-label">BNB</div>
+      <div class="stat-val">$594.20</div>
+      <div class="stat-sub" style="color:var(--green)">▲ +0.95% (24h)</div>
+    </div>
+  </div>
+
+  <!-- 2-column layout -->
+  <div class="layout-2">
+
+    <!-- Table -->
+    <div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-title">RANKING DE MERCADO</div>
+        <div class="filter-row">
+          <button class="fbtn active">Todas</button>
+          <button class="fbtn">★ Favoritos</button>
+          <button class="fbtn">↕ Rank</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>★</th><th>#</th><th>Moeda</th>
+            <th class="r">Preço</th><th class="r">24h</th><th class="r">7d</th>
+            <th class="r">Market Cap</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+
+      <!-- BTC Chart -->
+      <div class="chart-card">
+        <div class="chart-card-title">BITCOIN · BTC/USD</div>
+        <div class="chart-card-sub">Histórico de Preço</div>
+        <div class="period-row">
+          <button class="pbtn">24H</button>
+          <button class="pbtn active">7D</button>
+          <button class="pbtn">30D</button>
+          <button class="pbtn">90D</button>
+        </div>
+        <canvas id="btcChart" height="160"></canvas>
+      </div>
+
+      <!-- Dominance -->
+      <div class="dom-card">
+        <div class="dom-title">DOMINÂNCIA DE MERCADO</div>
+        <div id="dominance"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div>Dados por <a href="https://coingecko.com" target="_blank">CoinGecko API</a> · Atualização automática a cada 60s · Preview do Dashboard</div>
+    <div>CryptoNova · Projeto de Portfólio</div>
+  </footer>
+
+</main>
+
+<script>
+// ── Mock Data ─────────────────────────────────────────────────────────────────
+const coins = [
+  { rank:1, name:"Bitcoin",   sym:"BTC", price:67234, chg24:2.34,  chg7:8.12,  cap:"$1.30T", emoji:"₿",  colors:["#F7931A","#FFD700"] },
+  { rank:2, name:"Ethereum",  sym:"ETH", price:3421,  chg24:1.82,  chg7:5.40,  cap:"$411B",  emoji:"Ξ",  colors:["#627EEA","#00CFFF"] },
+  { rank:3, name:"BNB",       sym:"BNB", price:594,   chg24:0.95,  chg7:3.10,  cap:"$88B",   emoji:"⬡", colors:["#F3BA2F","#FFD700"] },
+  { rank:4, name:"Solana",    sym:"SOL", price:178,   chg24:-0.51, chg7:12.30, cap:"$80B",   emoji:"◎",  colors:["#9945FF","#FF2D6B"] },
+  { rank:5, name:"XRP",       sym:"XRP", price:0.612, chg24:3.20,  chg7:1.50,  cap:"$68B",   emoji:"✕",  colors:["#00AAE4","#00CFFF"] },
+  { rank:6, name:"Cardano",   sym:"ADA", price:0.487, chg24:-1.20, chg7:-2.30, cap:"$17B",   emoji:"◈",  colors:["#0033AD","#00CFFF"] },
+  { rank:7, name:"Dogecoin",  sym:"DOGE",price:0.162, chg24:5.50,  chg7:18.20, cap:"$23B",   emoji:"Ð",  colors:["#C2A633","#FFD700"] },
+  { rank:8, name:"Avalanche", sym:"AVAX",price:38.20, chg24:-0.80, chg7:4.20,  cap:"$16B",   emoji:"▲",  colors:["#E84142","#FF6B00"] },
+];
+
+const fmt = {
+  price: n => n >= 1000 ? `$${n.toLocaleString('en-US', {maximumFractionDigits:0})}` : `$${n.toFixed(3)}`,
+  pct:   n => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`,
+};
+
+// ── Render Table ──────────────────────────────────────────────────────────────
+const tbody = document.getElementById("tableBody");
+coins.forEach(c => {
+  const isPos24 = c.chg24 >= 0, isPos7 = c.chg7 >= 0;
+  tbody.innerHTML += `
+    <tr class="crow">
+      <td style="padding-left:14px;color:#7A7A99;font-size:14px;">☆</td>
+      <td class="rank">${c.rank}</td>
+      <td>
+        <div class="coin-info">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${c.colors[0]},${c.colors[1]});
+            display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${c.emoji}</div>
+          <div>
+            <div class="coin-name">${c.name}</div>
+            <div class="coin-sym">${c.sym}</div>
+          </div>
+        </div>
+      </td>
+      <td class="price">${fmt.price(c.price)}</td>
+      <td style="text-align:right">
+        <span class="badge ${isPos24 ? 'g' : 'r'}">${isPos24 ? '▲' : '▼'} ${Math.abs(c.chg24).toFixed(2)}%</span>
+      </td>
+      <td style="text-align:right">
+        <span class="badge ${isPos7 ? 'g' : 'r'}">${isPos7 ? '▲' : '▼'} ${Math.abs(c.chg7).toFixed(2)}%</span>
+      </td>
+      <td class="cap">${c.cap}</td>
+    </tr>`;
+});
+
+// ── BTC Price Chart ───────────────────────────────────────────────────────────
+function genPrices(base, days, vol) {
+  const pts = [];
+  let p = base;
+  for (let i = 0; i < days; i++) {
+    p += (Math.random() - 0.48) * vol;
+    pts.push(Math.max(p, base * 0.7));
+  }
+  return pts;
+}
+
+const btcPrices = genPrices(62000, 28, 800);
+const labels = btcPrices.map((_, i) => {
+  const d = new Date(); d.setDate(d.getDate() - (28 - i));
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+});
+
+const ctx = document.getElementById('btcChart').getContext('2d');
+const grad = ctx.createLinearGradient(0, 0, 0, 160);
+grad.addColorStop(0, 'rgba(255,215,0,0.25)');
+grad.addColorStop(1, 'rgba(255,215,0,0.01)');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      data: btcPrices,
+      borderColor: '#FFD700',
+      borderWidth: 2,
+      backgroundColor: grad,
+      fill: true,
+      tension: 0.4,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      pointHoverBackgroundColor: '#FFD700',
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false },
+      tooltip: {
+        backgroundColor: '#13132A', borderColor: 'rgba(255,107,0,0.3)',
+        borderWidth: 1, titleColor: '#7A7A99', bodyColor: '#FFD700',
+        bodyFont: { family: 'Space Mono', size: 13, weight: 'bold' },
+        callbacks: { label: ctx => `$${ctx.parsed.y.toLocaleString('en-US', {maximumFractionDigits:0})}` }
+      }
+    },
+    scales: {
+      x: { display: false },
+      y: { display: false, grid: { display: false } }
+    },
+    interaction: { mode: 'index', intersect: false },
+  }
+});
+
+// ── Dominance Bars ────────────────────────────────────────────────────────────
+const dom = [
+  { name: "Bitcoin",  sym:"BTC", pct: 52.3, color: "#F7931A" },
+  { name: "Ethereum", sym:"ETH", pct: 17.1, color: "#627EEA" },
+  { name: "BNB",      sym:"BNB", pct:  3.6, color: "#F3BA2F" },
+  { name: "Solana",   sym:"SOL", pct:  3.3, color: "#9945FF" },
+  { name: "Outros",   sym:"...", pct: 23.7, color: "#7A7A99" },
+];
+const domEl = document.getElementById("dominance");
+dom.forEach(d => {
+  domEl.innerHTML += `
+    <div class="dom-item">
+      <div class="dom-row">
+        <div class="dom-name">
+          <div class="dom-dot" style="background:${d.color};box-shadow:0 0 6px ${d.color}66;"></div>
+          ${d.name} <span style="color:var(--muted);font-size:10px;font-family:var(--mono);">${d.sym}</span>
+        </div>
+        <div class="dom-pct">${d.pct}%</div>
+      </div>
+      <div class="dom-bar">
+        <div class="dom-fill" style="width:${d.pct}%;background:linear-gradient(90deg,${d.color},${d.color}88);"></div>
+      </div>
+    </div>`;
+});
+
+// ── Live clock ────────────────────────────────────────────────────────────────
+setInterval(() => {
+  const timeEl = document.querySelector('.time-pill');
+  const now = new Date().toLocaleTimeString('pt-BR');
+  timeEl.innerHTML = `<div class="dot"></div> LIVE · ${now}`;
+}, 1000);
+</script>
+</body>
+</html>
