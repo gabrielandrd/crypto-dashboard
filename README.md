@@ -1,11 +1,5 @@
 # ⚡ CryptoNova — Dashboard de Criptomoedas em Tempo Real
 
-<div align="center">
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-5.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
-[![License](https://img.shields.io/badge/License-MIT-FF6B00?style=flat-square)](LICENSE)
 
 **Dashboard profissional de criptomoedas com dados em tempo real, gráficos interativos e design futurista.**
 
