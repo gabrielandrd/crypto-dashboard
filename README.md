@@ -85,18 +85,6 @@ crypto-dashboard/
 - [Node.js 18+](https://nodejs.org/)
 - [Git](https://git-scm.com/)
 - VS Code (recomendado)
-
----
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/seu-usuario/crypto-dashboard.git
-cd crypto-dashboard
-```
-
----
-
 ### 2. Configurar o Backend (Python + FastAPI)
 
 ```bash
