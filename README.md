@@ -19,9 +19,6 @@
 ---
 
 ## 📸 Preview
-
-> *Dark mode com palette inspirada no álbum Discovery do Daft Punk — laranja néon, dourado e azul elétrico.*
-
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ⚡ CRYPTO NOVA     [buscar...]                    ↺     │
