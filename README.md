@@ -1,9 +1,6 @@
 # ⚡ CryptoNova — Dashboard de Criptomoedas em Tempo Real
 
 <div align="center">
-
-![CryptoNova Banner](https://via.placeholder.com/900x200/0A0A16/FFD700?text=CRYPTONOVA+DASHBOARD)
-
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
